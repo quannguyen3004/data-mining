@@ -1,4 +1,6 @@
 *.csv
 cleaned/
+2019-Nov-Cleaned/
+2019-Oct-Cleaned/
 .DS_Store
 *.ipynb_checkpoints/
