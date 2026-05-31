@@ -1,6 +1,9 @@
 *.csv
 cleaned/
-2019-Nov-Cleaned/
-2019-Oct-Cleaned/
+iceberg/
+olap_cube/
+rules/
 .DS_Store
 *.ipynb_checkpoints/
+__pycache__/
+*.pyc
