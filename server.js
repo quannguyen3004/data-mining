@@ -54,7 +54,8 @@ app.post('/api/v1/predict', async (req, res) => {
         // 2. Tự động trích xuất các đặc trưng thời gian thực (Real-time Context)
         const now = new Date();
         const hour = now.getHours();
-        const day_of_week_encoded = now.getDay(); // 0: Chủ nhật, 1: Thứ 2...
+        const jsDay = now.getDay();
+        const day_of_week_encoded = jsDay === 0 ? 6 : jsDay - 1;
 
         // Thiết lập cấu trúc mảng đúng thứ tự ma trận đầu vào của mô hình học máy:
         // ['price', 'hour', 'day_of_week_encoded', 'brand_encoded', 'category_code_encoded']
