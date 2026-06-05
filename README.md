@@ -28,3 +28,14 @@ CREATE TABLE IF NOT EXISTS product_metadata (
     category_code_encoded INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Tạo lập Index tăng tốc truy vấn cho tầng API Backend
+CREATE INDEX idx_product_id ON product_metadata(product_id);
+
+USE ecommerce_dwh;
+
+-- Tạo bảng lưu trữ tần suất tương tác tích lũy của từng User (Phục vụ Feature Engineering)
+CREATE TABLE IF NOT EXISTS user_interaction_metrics (
+    user_id VARCHAR(50) PRIMARY KEY,
+    interaction_score INT DEFAULT 0
+);
