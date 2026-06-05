@@ -1,0 +1,19 @@
+{
+  "total_events": 67501979,
+  "conversion_rate": 1.36,
+  "event_distribution": {
+    "view": 63556110,
+    "cart": 3028930,
+    "purchase": 916939
+  },
+  "price_descriptive_stats": {
+    "count": 67501979.0,
+    "mean": 292.45931656462915,
+    "std": 355.67449958606664,
+    "min": 0.0,
+    "25%": 69.24,
+    "50%": 165.77,
+    "75%": 360.34,
+    "max": 2574.07
+  }
+}

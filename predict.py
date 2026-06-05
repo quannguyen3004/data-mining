@@ -2,46 +2,52 @@ import sys
 import json
 import joblib
 import numpy as np
-import pandas as pd  # Import thêm thư viện pandas để xử lý tên đặc trưng
+import pandas as pd
 import warnings
 
-# Tắt các cảnh báo không cần thiết nếu có phát sinh ngầm định
 warnings.filterwarnings("ignore", category=UserWarning)
 
 def main():
     try:
-        # Tải mô hình và bộ chuẩn hóa mang tri thức gộp từ pha huấn luyện
         model = joblib.load('svm_final_model.joblib')
         scaler = joblib.load('data_scaler_combined.joblib')
 
-        # Tiếp nhận mảng dữ liệu đặc trưng tĩnh và động đẩy sang từ Node.js API
-        input_features = json.loads(sys.argv[1])
-        
-        # Định nghĩa đúng danh sách tên các đặc trưng theo thứ tự ma trận huấn luyện
+        # Nhận mảng JSON thực tế do biến pythonProcess trong server.js truyền sang
+        raw_input = sys.argv[1].strip()
+        features_array = json.loads(raw_input)
+
+        # Ánh xạ chính xác các đặc trưng thực tế từ DWH và Context thời gian thực
+        price = float(features_array[0])
+        hour = int(features_array[1])
+        day_of_week = int(features_array[2])
+        brand_encoded = int(features_array[3])
+        category_code_encoded = int(features_array[4])
+
         feature_names = ['price', 'hour', 'day_of_week_encoded', 'brand_encoded', 'category_code_encoded']
         
-        # Ép kiểu dữ liệu mảng đầu vào thành cấu trúc Pandas DataFrame để khớp thuộc tính tên
-        features_df = pd.DataFrame([input_features], columns=feature_names)
+        input_data = [price, hour, day_of_week, brand_encoded, category_code_encoded]
+        features_df = pd.DataFrame([input_data], columns=feature_names)
 
-        # Thực hiện chuẩn hóa dữ liệu đầu vào (Không còn bị cảnh báo UserWarning)
         features_scaled = scaler.transform(features_df)
-
-        # Tính toán biên độ khoảng cách siêu phẳng quyết định của LinearSVC
-        decision_score = model.decision_function(features_scaled)[0]
+        decision_score = float(model.decision_function(features_scaled)[0])
         
-        # Định nghĩa ngưỡng quyết định phân lớp nhị phân
         threshold = 0.0  
         is_purchase = 1 if decision_score >= threshold else 0
 
-        # Phản hồi cấu trúc dữ liệu kết quả về cho Node.js API
         output = {
-            "is_purchase": int(is_purchase),
-            "confidence_score": float(decision_score)
+            "success": True,
+            "prediction": is_purchase,
+            "confidence_score": round(decision_score, 4),
+            "realtime_context": {
+                "hour": hour,
+                "day_of_week_encoded": day_of_week,
+                "dynamic_price_applied": price
+            }
         }
         print(json.dumps(output))
 
     except Exception as e:
-        print(json.dumps({"error": str(e)}))
+        print(json.dumps({"success": False, "error": str(e)}))
 
 if __name__ == "__main__":
     main()
